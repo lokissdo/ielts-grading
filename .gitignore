@@ -1,4 +1,10 @@
-.venv
-app/ML/models
+venv
+ielts_writing_dataset.csv
 app/ML/__pycache__
 app/__pycache__
+ev
+app/ML/models/training_bert_text/cp.ckpt
+app/ML/models/training_bert_num/cp.ckpt
+app/ML/models/training_bert_num_bin/cp.ckpt
+ielts_writing_dataset.csv
+app/speech2text
