@@ -1,147 +1,135 @@
-![Logo](https://github.com/Logisx/IELTS-Grading/blob/main/assets/deepessay-high-resolution-color-logo.png?raw=true)
+# IELTS Grading
 
-# :page_facing_up: Table of Contents 
+IELTS Grading is a server where we deploy our models in our app with two main features: Speaking Grading and Writing Grading.
 
-- [:page\_facing\_up: Table of Contents](#page_facing_up-table-of-contents)
-- [:rocket: Grade your IELTS essay with BERT](#rocket-grade-your-ielts-essay-with-bert)
-  - [:star: Features](#star-features)
-  - [:bar\_chart: Model choice](#bar_chart-model-choice)
-  - [:toolbox: Tech Stack](#toolbox-tech-stack)
-  - [:file\_folder: Project structure](#file_folder-project-structure)
-  - [:computer: Run Locally](#computer-run-locally)
-- [:world\_map: Roadmap](#world_map-roadmap)
-- [⚖️ License](#️-license)
-- [🔗 Links](#-links)
-# :rocket: Grade your IELTS essay with BERT
+## Architecture
 
-Welcome to the [IELTS Essay Grading Web Application](https://ielts-grading.azurewebsites.net/)! This web app is designed to provide users with a convenient and efficient way to have their IELTS essays assessed and receive a predicted score using a Machine Learning model.
+- Writing Grading: We use a model from [GitHub](https://github.com/Logisx/DeepEssay) and utilize __BardAPI__ for giving two answers for more detail. With __DeepEssay__, we use the examinee essay as input and the score as output. With __BardAPI__, we use the prompt to get the score and explanation.
+- Speaking Grading: We utilize _pydub_ and _ffmpeg_ to convert MP3 to WAV and __DeepSpeech__ for __Speech-to-Text__. Afterward, we use __BardAPI__ again to grade the candidate's work.
+- We also support __Tesseract OCR__ for converting PDF or images to text for Writing Grading.
 
-![Version](https://img.shields.io/badge/Version-1.0-blue.svg)
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/) \
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![Flask](https://img.shields.io/badge/Flask-2.3-green)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.14-orange)
-![BERT](https://img.shields.io/badge/BERT-NLP-ff6600)
-![Docker](https://img.shields.io/badge/Docker-24.0-blue)
-![Microsoft Azure](https://img.shields.io/badge/Microsoft%20Azure-Cloud-0089D6)
-![REST](https://img.shields.io/badge/REST-API-5b68d6)
+## API Endpoint
 
+### OCR
 
-![Demo](https://github.com/Logisx/IELTS-Grading/blob/main/assets/Demo.gif?raw=true)
+- __Request__: 
+    ```
+    POST: '/api/ocr'`.  
+    Content-Type: multipart/form-data
+    Body:
+   {
+       "file": file (type binary file))
+    }. 
+    ```
+- __Response__: 
+    ```
+    {"text": text-after-ocr (string)}
+    ```
 
+### Writing Grading
 
-## :star: Features
-- **Submit Essays**: Users can submit their IELTS essays directly through the web application. The process is user-friendly and straightforward.
+- __Request__: 
+    ```
+    POST: '/api/writting/grade'`. 
+    Content-Type: application/json
+    Body:
+    {
+        "question": question-of-test (string),
+        "answer"  : answer-of-candidate (string).
+    }
+    ```
 
-- **Machine Learning Essay Grading**: The heart of this application is a finely-tuned BERT (Bidirectional Encoder Representations from Transformers) model. This model analyzes and assesses the submitted essays, considering a variety of linguistic and structural aspects.
+- __Response__: 
+    ```
+    {
+        "model_grade": score-from-deepessay-model (double),
+        "warnings"    : warnings (array of strings), 
+        "bard_grade"  : score-from-bard-model (double), 
+        "explanation" : explanation-from-bard (string)
+    }
+    ```
+### Speaking Grading
 
-- **Predicted Score**: After processing the essay, the application provides users with a predicted IELTS score. This score is an estimate of how the essay might be rated in the actual IELTS exam, helping users gauge their writing proficiency.
-
-- **Warning functionality**: The application includes a warning feature that checks the submitted text. It will display a warning if the essay is too short or if the text does not meet the minimum requirements. This ensures that users are provided with guidance on submitting valid essays.
-<img src="https://github.com/Logisx/IELTS-Grading/blob/main/assets/Warnings_demo.gif?raw=true" width="400" alt="Warnings demo">
-
-## :bar_chart: Model choice
-**Detailed training overview with EDA and Feature engineering** can be found in the [notebook](https://github.com/Logisx/IELTS-Grading/blob/main/IELTS_Grading_with_BERT.ipynb).\
-**Dataset**: [IELTS Writing Scored Essays Dataset
-](https://www.kaggle.com/datasets/mazlumi/ielts-writing-scored-essays-dataset)
-
-After analysing different approaches I decided to continue with 3 models:
-1. **BERT fine-tuned for a regression task**
-2. **BERT output concatenated with numerical features**
-3. **BERT output concatenated with numerical and binary features**
-  
-The model structures and corresponding Mean Absolute Error (MAE) metrics are shown in the figures below:
-![Models structure](https://github.com/Logisx/IELTS-Grading/blob/main/assets/Model_structure_white.png?raw=true)
-<img src="https://github.com/Logisx/IELTS-Grading/blob/main/assets/models_mae.png?raw=true" width="400" alt="Models MAE"> 
-
-Although more complex models produce better results, after testing, it was decided to use a text model for lower latency.
-
-
-## :toolbox: Tech Stack
-
-- **Framework**: Flask
-- **NLP**: TensorFlow, BERT, Hugging Face Transformers, Sklearn
-- **Deployment**: Docker, Microsoft Azure
-- **Frontend**: HTML, CSS, JavaScript
-- **Version Control**: Git, GitHub
-- **Testing**: REST client
-
-## :file_folder: Project structure
+- __Request__: 
 ```
-+---app
-|   |   main.py
-|   |   text_validation.py
-|   |   __init__.py
-|   |
-|   +---ML
-|   |   |   pipeline.py
-|   |   |   __init__.py
-|   |   |
-|   |   \---models
+
+    POST: '/api/writing/grade' 
+    Content-Type: multipart/form-data
+    Body: 
+    {
+        "file"   : answer-file (binary file), 
+        "question": question-of-test (string)
+    } 
+ ```
+- __Response__: 
+```
+  {
+    "grade"      : score-from-bard-model (double), 
+    "explanation": explanation-from-bard (string)
+  }
+```
+##  Installing 
+
+### Prerequisites (only Windows)
+
+- ffmpeg: https://ffmpeg.org/download.html
+- Tesseract OCR model: https://github.com/tesseract-ocr/tesseract
+- DeepSpeech model: https://github.com/mozilla/DeepSpeech
+- Writing model: after training, follow the instruction: https://github.com/Logisx/DeepEssay
+- BardAPI: not having original API, use cookie approach: https://github.com/dsdanielpark/Bard-API
+
+### Steps
+
+- Clone the repository: 
+
+```bash
+    git clone https://github.com/lokissdo/ielts-grading
+```
+
+- Place the writing model in ML folder:
+
+```
+	\---models
 |   |       +---training_bert_num
 |   |       |
 |   |       +---training_bert_num_bin
 |   |       |
 |   |       \---training_bert_text
-|   |   
-|   +---static
-|   |
-|   \---templates
-|         index.html
-|         warning.html
-|   
-+---assets
-|
-|   .gitignore
-|   Dockerfile
-|   IELTS_Grading_with_BERT.ipynb
-|   LICENSE
-|   README.md
-\   requirements.txt
+
 ```
 
-## :computer: Run Locally
+- Place the DeepSpeech model in app folder:
+```
+	\---speechtotext
+|   |       +---deepspeech-0.9.3-models.pbmm
+|   |       |
+|   |       +---deepspeech-0.9.3-models.scorer
+|   |       |
+```
 
-1. Clone the project
+- Install the requirements:
 
 ```bash
-  git clone https://github.com/Logisx/IELTS-Grading.git
+    pip install -r requirements.txt
 ```
-
-2. Go to the project directory
+- Run the app: 
 
 ```bash
-  cd my-project
+    pip app/main.py
 ```
 
-3. Install dependencies
-
-```bash
-  pip install -r requirements.txt
-```
-
-4. Train a model in a notebook and save the weights to:
-```bash
-  ./app/ML/models/training_bert_text
-```
-5. Start the server
-
-```bash
-  python app/main.py
-```
-
-# :world_map: Roadmap
-
-1. **Testing features**: Develop unit tests and integrations test.
-2. **Data collection**: Aggregate more data to improve accuracy.
-3. **Educational insights feature**: Along with the score, the application will offer insights and suggestions for improvement, making it a valuable educational tool for those looking to enhance their writing skills.
 
 
-# ⚖️ License
+Make sure to follow the provided links for downloading and setting up the required models and libraries.
+
+
+## ⚖️ License
 
 [MIT](https://github.com/Logisx/DeepEssay/blob/main/LICENSE)
 
 
-# 🔗 Links
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/aleksandrshishkov)
+## 🔗 Links
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/do-khai-hung-3b5a18231/)
+[![facebook](http://i.imgur.com/P3YfQoD.png)](https://www.facebook.com/hung.khai.982292/)
+
 
