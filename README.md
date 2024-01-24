@@ -78,6 +78,11 @@ IELTS Grading is a server where we deploy our models in our app with two main fe
 - Writing model: after training, follow the instruction: https://github.com/Logisx/DeepEssay
 - BardAPI: not having original API, use cookie approach: https://github.com/dsdanielpark/Bard-API
 
+
+Ensure your **Tesseract** in path : 
+    **C:\Program Files\Tesseract-OCR\tesseract.exe**
+      and  
+  **ffmpeg** in path : **C:\ffmpeg\bin\ffmpeg.exe**
 ### Steps
 
 - Clone the repository: 
