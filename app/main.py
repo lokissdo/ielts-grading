@@ -24,13 +24,20 @@ import pytesseract
 from PIL import Image
 from utils import *
 from pdf2image import convert_from_path
+from config import *
 
-# Need to download Tesseract.exe from "https://www.ffmpeg.org/download.html" 
-# Need to download poppler from "https://github.com/oschwartz10612/poppler-windows" 
-# Need to download poppler from "https://github.com/oschwartz10612/poppler-windows" 
+# Need to download FFmpeg from "https://www.ffmpeg.org/download.html" 
+# Need to download Tesseract.exe from "https://github.com/tesseract-ocr/tesseract" 
 
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = TESSERACT_PATH
+cookie_dict = {
+            "__Secure-1PSID": Secure_1PSID_COOKIE,
+            "__Secure-1PSIDTS": Secure_1PSIDTS_COOKIE,
+            "__Secure-1PSIDCC": Secure_1PSIDCC_COOKIE,
+    # Any cookie values you want to pass session object.
+            # Any cookie values you want to pass session object.
+        }
 
 
 
@@ -41,13 +48,7 @@ pipeline = Pipeline()
 validator = Validator()
 
 
-cookie_dict = {
-        "__Secure-1PSID": "egg2w1HDtzTqAAleZlAzg2LYt2KAzWHnt_sUSgPAivm9SotI0a6jK3NU4ZF77bEImcAeZg.",
-            "__Secure-1PSIDTS": "sidts-CjIBPVxjSrXpmrpoaSAmXnZCyE1T2GoXIDSdm_6IVtqKfCUIhGoeUI6llLYSYRErAspeDhAA",
-            "__Secure-1PSIDCC": "ABTWhQHQ2P5X6Vhd7fp_r8NVJ2pW52AifGgXhD4POyl1RS63HUjoSwMoDPTXYvyU54YjeMhHJiZv",
-    # Any cookie values you want to pass session object.
-            # Any cookie values you want to pass session object.
-        }
+
 bard = BardCookies(cookie_dict=cookie_dict)
 
 
@@ -147,6 +148,8 @@ def speaking_grade():
 
         bardAns = bard.get_answer(prompt)['content']
         bardGrade = extract_grade(bardAns)
+
+        # essay_grade = pipeline.run([answer])
         # bardGrade = 1
         # bardAns = " "
         # Save the result
@@ -195,5 +198,5 @@ def ocr():
 
 if __name__ == "__main__":
     print("Running the app...")
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
 

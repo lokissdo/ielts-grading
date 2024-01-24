@@ -4,10 +4,10 @@ import deepspeech
 import wave
 import numpy as np
 
+from config import *
 
-STT_MODEL_PATH = "./app/speech2text/deepspeech-0.9.3-models.pbmm"
-LM_PATH = "./app/speech2text/deepspeech-0.9.3-models.scorer"
 BEAM_WIDTH = 500
+AudioSegment.converter  = FFMPEG_PATH
 
 
 
@@ -40,7 +40,6 @@ def extract_grade(text):
     else:
         return None
     
-AudioSegment.converter  = "C://ffmpeg/bin/ffmpeg.exe" 
 def convert_audio(file):
     # Load audio file
     audio = AudioSegment.from_mp3(file)
