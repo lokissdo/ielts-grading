@@ -53,7 +53,7 @@ IELTS Grading is a server where we deploy our models in our app with two main fe
 - __Request__: 
 ```
 
-    POST: '/api/writing/grade' 
+    POST: '/api/speaking/grade' 
     Content-Type: multipart/form-data
     Body: 
     {
@@ -81,8 +81,8 @@ IELTS Grading is a server where we deploy our models in our app with two main fe
 
 Ensure your **Tesseract** in path : 
     **C:\Program Files\Tesseract-OCR\tesseract.exe**
-      and  
-  **ffmpeg** in path : **C:\ffmpeg\bin\ffmpeg.exe**
+      ,  
+  **ffmpeg** in path : **C:\ffmpeg\bin\ffmpeg.exe**, and your cookies should be valid or you should change it in **config.py**
 ### Steps
 
 - Clone the repository: 
